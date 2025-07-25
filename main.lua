@@ -176,10 +176,8 @@ local PlaceID = game.PlaceId
 local AllIDs = {}
 local foundAnything = ""
 local actualHour = os.date("!*t").hour
-local Deleted = false
 local lastIsVisibleTick = tick()
 local lastIsVisible = false
-local KatanaDetected = false
 
 local function sendNotification(messageText)
 	if not Fluent then return end
@@ -240,6 +238,7 @@ local function setupInput(featureName, bindOption, stateVariableName, toggleMode
 	if currentBind.EnumType == Enum.KeyCode then
 		if toggleMode then
 			handler.stateLoop = RunService.RenderStepped:Connect(function()
+				if UserInputService:GetFocusedTextBox() then return end
 				local isDown = UserInputService:IsKeyDown(currentBind)
 				if isDown and not handler.lastState then
 					getgenv()[stateVariableName] = not getgenv()[stateVariableName]
@@ -257,6 +256,7 @@ local function setupInput(featureName, bindOption, stateVariableName, toggleMode
 		if toggleMode then
 			handler.beganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
 				if gameProcessed then return end
+				if UserInputService:GetFocusedTextBox() then return end
 				if input.UserInputType == currentBind and not handler.lastState then
 					getgenv()[stateVariableName] = not getgenv()[stateVariableName]
 					sendNotification(featureName .. " has been " .. (getgenv()[stateVariableName] and "Enabled" or "Disabled"))
@@ -266,6 +266,7 @@ local function setupInput(featureName, bindOption, stateVariableName, toggleMode
 
 			handler.endedConnection = UserInputService.InputEnded:Connect(function(input, gameProcessed)
 				if gameProcessed then return end
+				if UserInputService:GetFocusedTextBox() then return end
 				if input.UserInputType == currentBind then
 					handler.lastState = false
 				end
@@ -407,8 +408,8 @@ end
 
 Settings:Load()
 
-getgenv().UnjiWareNameSaved = "UNJIWARE.XYZ"
-getgenv().UnjiWareVerSaved = "V4.0.3"
+getgenv().UnjiWareNameSaved = "UNJIWARE.WTF"
+getgenv().UnjiWareVerSaved = "v4.0.5"
 getgenv().isAimKeyPress = false
 getgenv().ServerHob = function ()
 	while wait() do
@@ -422,8 +423,8 @@ getgenv().ServerHob = function ()
 end
 
 local Window = Fluent:CreateWindow({
-	Title = "UNJIWARE.XYZ",
-	SubTitle = "By NOMUHYUN",
+	Title = "UNJIWARE.WTF",
+	SubTitle = "By 무현",
 	TabWidth = 150,
 	Size = UDim2.fromOffset(580, 360),
 	MinSize = Vector2.new(470, 380),
@@ -469,9 +470,6 @@ run(function()
 	local rankmeowmeow = "User"
 	local savePing = 0
 	local PingStats = "Good"
-	if Players:GetUserIdFromNameAsync(player.Name) == 2759165852 then
-		rankmeowmeow = "Owner"
-	end
 
 	Tabs.Home:CreateParagraph("welcome",{
 		Title = "Welcome To " .. getgenv().UnjiWareNameSaved .. " " .. getgenv().UnjiWareVerSaved .. "!, " ..player.Name,
@@ -490,8 +488,7 @@ run(function()
 
 	task.spawn(function()
 		while true do
-			wait(1.5)
-
+			task.wait(1.5)
 			local networkStats = StatsService.Network.ServerStatsItem["Data Ping"]
 			savePing = math.floor(networkStats:GetValue())
 			if savePing <= 150 then
@@ -518,7 +515,6 @@ run(function()
 
 	local ToggleAimbot = Tabs.Combat:CreateToggle("ToggleAimbot", {
 		Title = "Aimbot",
-		--Description = "Automatically follow the selected body part of players when aiming",
 		Default = getgenv().ToggleAimbot or true
 	})
 	ToggleAimbot:OnChanged(function()
@@ -526,7 +522,6 @@ run(function()
 	end)
 	local AimPartDropdown = Tabs.Combat:CreateDropdown("AimPart", {
 		Title = "Aimbot Part",
-		--Description = "Choose which part of the body the aimbot locks onto: head, torso, or random",
 		Values = {"Head", "Torso"},
 		Multi = false, 
 		Default = getgenv().AimPart or 1
@@ -536,7 +531,6 @@ run(function()
 	end)
 	local AimMovementDropdown = Tabs.Combat:CreateDropdown("Movement", {
 		Title = "Movement",
-		--Description = "Choose whether you want to move with the mouse or the camera",
 		Values = {"Mouse", "Camera"},
 		Multi = false,
 		Default = getgenv().Movement or 1
@@ -564,8 +558,7 @@ run(function()
 	local humanAim, healthCheck, CheckTeams, WallCheck, AimbotSmoothness
 
 	humanAim = AimbotSettingSection:CreateToggle("humanAim", {
-		Title = "Human Aim [SAFE]",
-		--Description = "Our recommendation for use of this feature is a smoothness setting of 10\n이 기능을 사용할 시 Smoothness를 10으로 설정하는것을 권장합니다",
+		Title = "Human Aim",
 		Default = getgenv().HumanAim
 	})
 	humanAim:OnChanged(function()
@@ -573,7 +566,6 @@ run(function()
 	end)
 	healthCheck = AimbotSettingSection:CreateToggle("healthCheck", {
 		Title = "Health Check",
-		--Description = "Only target players who have health remaining",
 		Default = getgenv().healthCheck
 	})
 	healthCheck:OnChanged(function()
@@ -581,7 +573,6 @@ run(function()
 	end)
 	CheckTeams = AimbotSettingSection:CreateToggle("CheckTeams", {
 		Title = "Team Check",
-		--Description = "Only target players who are on the enemy team",
 		Default = getgenv().CheckTeams
 	})
 	CheckTeams:OnChanged(function()
@@ -589,7 +580,6 @@ run(function()
 	end)
 	WallCheck = AimbotSettingSection:CreateToggle("WallCheck", {
 		Title = "Wall Check",
-		--Description = "Prevents aiming at players hiding behind walls.",
 		Default = getgenv().WallCheck
 	})
 	WallCheck:OnChanged(function()
@@ -597,7 +587,6 @@ run(function()
 	end)
 	AimbotSmoothness = AimbotSettingSection:CreateSlider("AimbotSmoothness", {
 		Title = "Smoothness",
-		--Description = "Control how smoothly the aimbot locks onto targets",
 		Default = Settings.Current.Values.AimbotSmoothness or getgenv().AimbotSmoothness or 1,
 		Min = 1,
 		Max = 10,
@@ -610,7 +599,6 @@ run(function()
 
 	local AimPositionX = AimbotSettingSection:CreateSlider("AimPositionX", {
 		Title = "Aim PositionX",
-		--Description = "Sets which x-coordinate to aim at\nDefault: 2.5",
 		Default = Settings.Current.Values.AimPositionX or getgenv().AimPositionX or 2.5,
 		Min = 0,
 		Max = 5,
@@ -623,7 +611,6 @@ run(function()
 
 	local AimPositionY = AimbotSettingSection:CreateSlider("AimPositionY", {
 		Title = "Aim PositionY",
-		--Description = "Sets which y-coordinate to aim at\nDefault: 2.5",
 		Default = Settings.Current.Values.AimPositionY or getgenv().AimPositionY or 2.5,
 		Min = 0,
 		Max = 5,
@@ -637,7 +624,6 @@ run(function()
     local CustomBulletSection = Tabs.Combat:CreateSection("Custom Bullet")
     local CustomBullet = CustomBulletSection:CreateToggle("CustomBullet", {
         Title = "Custom Bullet",
-        Description = "",
         Default = Settings.Current.Toggles.CustomBullet or false
     })
 
@@ -653,7 +639,6 @@ run(function()
 	local FovSettingSection = Tabs.Combat:CreateSection("Fov Setting")
 	local DrawFov = FovSettingSection:CreateToggle("DrawFov", {
 		Title = "Draw Fov",
-		--Description = "Display the Field of View (Fov) circle, showing the area where the aimbot can lock onto targets",
 		Default = getgenv().DrawFov
 	})
 	DrawFov:OnChanged(function()
@@ -662,7 +647,6 @@ run(function()
 
 	local FovRadius = FovSettingSection:CreateSlider("FovRadius", {
 		Title = "Fov Radius",
-		--Description = "Adjust the radius of the Field of View (Fov) to control how wide the aimbot's targeting area is",
 		Default = Settings.Current.Values.FovRadius or getgenv().FovRadius or 150,
 		Min = 1,
 		Max = 1000,
@@ -676,7 +660,6 @@ run(function()
 
 	local FovColorPicker = FovSettingSection:CreateColorpicker("FovColor", {
 		Title = "Fov Color",
-		--Description = "Change the color of the Field of View (Fov) circle",
 		Default = getgenv().FovColor or Color3.fromRGB(113,96,232)
 	})
 
@@ -686,7 +669,6 @@ run(function()
 
 	local ToggleBoxEsp = Tabs.Visuals:CreateToggle("ToggleBoxEsp", {
 		Title = "Box",
-		--Description = "Enable or disable Box ESP, which draws a box around players to show their positions",
 		Default = getgenv().ToggleBoxEsp
 	})    
 	ToggleBoxEsp:OnChanged(function()
@@ -701,7 +683,6 @@ run(function()
 	end)
 	local ToggleTracerEsp = Tabs.Visuals:CreateToggle("ToggleTracerEsp", {
 		Title = "Tracer",
-		--Description = "Draws triangle from a customizable point on your screen to show the location of other players",
 		Default = getgenv().ToggleTracerEsp
 	})
 	ToggleTracerEsp:OnChanged(function()
@@ -714,12 +695,10 @@ run(function()
 	})
 	local ToggleNameEsp = Tabs.Visuals:CreateToggle("ToggleNameEsp", {
 		Title = "Name",
-		--Description = "Shows the names and health of players above their heads",
 		Default = false
 	})
 	local DisplayNameChk = Tabs.Visuals:CreateToggle("DisplayNameChk", {
 		Title = "DisplayName",
-		--Description = "Shows the names and health of players above their heads",
 		Default = false
 	})
 	DisplayNameChk:OnChanged(function()
@@ -732,13 +711,11 @@ run(function()
 	local ESPSettingSection = Tabs.Visuals:CreateSection("ESP Settings")
 	local ToggleBoxFilled = ESPSettingSection:CreateToggle("ToggleBoxFilled", {
 		Title = "Fill Box",
-		--Description = "Fill the box with translucency",
 		Default = Settings.Current.Toggles.ToggleBoxFilled
 	})
 
 	local TracerRadius = ESPSettingSection:CreateSlider("TracerRadius", {
 		Title = "Tracer Radius",
-		--Description = "Adjust the radius of the Field of View (Fov) to control how wide the tracer's showing area is",
 		Default = Settings.Current.Values.TracerRadius or getgenv().TracerRadius or 100,
 		Min = 0,
 		Max = 1000,
@@ -752,7 +729,6 @@ run(function()
 
 	local EspColorPicker = ESPSettingSection:CreateColorpicker("EspColor", {
 		Title = "ESP Color",
-		--Description = "Adjust the color used for ESP highlights, player names, and tracer lines",
 		Default = getgenv().EspColor or Color3.fromRGB(113,96,232)
 	})
 	EspColorPicker:OnChanged(function()
@@ -761,7 +737,6 @@ run(function()
 
 	local EspTeamCheck = ESPSettingSection:CreateToggle("EspTeamCheck", {
 		Title = "Team Check",
-		--Description = "Secure the position of a team other than your current team",
 		Default = getgenv().EspTeamCheck or false
 	})
 	EspTeamCheck:OnChanged(function()
@@ -770,7 +745,6 @@ run(function()
 
 	local EspTeamColor = ESPSettingSection:CreateToggle("EspTeamColor", {
 		Title = "Team Color",
-		--Description = "Depending on the team, the ESP color of the player belonging to that team is assigned the team color",
 		Default = getgenv().EspTeamColor or true
 	})
 	EspTeamColor:OnChanged(function()
@@ -779,19 +753,16 @@ run(function()
 
     local ForceFieldArm = Tabs.Players:CreateToggle("ForceFieldArm", {
 		Title = "Arm Changer",
-		--Description = "This allows you to go faster at your own pace",
 		Default = false
 	})
 
 	local FlyEnabled = Tabs.Players:CreateToggle("FlyEnabled", {
 		Title = "Fly",
-		--Description = "This allows you to go faster at your own pace",
 		Default = false
 	})
 
 	local CFrameWalk = Tabs.Players:CreateToggle("CFrameWalk", {
 		Title = "CFrame Walk",
-		--Description = "This allows you to go faster at your own pace",
 		Default = false
 	})
 
@@ -834,7 +805,6 @@ run(function()
 
 	local FlySpeed = Tabs.Players:CreateSlider("FlySpeed", {
 		Title = "Fly Speed",
-		--Description = "Choose how much to adjust the current speed",
 		Default = Settings.Current.Values.FlySpeed or getgenv().FlySpeed or 50,
 		Min = 0,
 		Max = 150,
@@ -845,7 +815,6 @@ run(function()
 
 	local WalkSpeed = Tabs.Players:CreateSlider("WalkSpeed", {
 		Title = "CFrame Speed",
-		--Description = "Choose how much to adjust the current speed",
 		Default = Settings.Current.Values.WalkSpeed or getgenv().WalkSpeed or 0,
 		Min = 0,
 		Max = 100,
@@ -858,7 +827,6 @@ run(function()
 
 	local ToggleAntiFling = PlayerSettingTab:CreateToggle("AntiFling", {
 		Title = "Anti Fling",
-		--Description = "If a fling is detected, it immediately returns to its previous safe position",
 		Default = getgenv().AntiFling
 	})
 	ToggleAntiFling:OnChanged(function()
@@ -867,7 +835,6 @@ run(function()
 
 	local ToggleInfJump = PlayerSettingTab:CreateToggle("ToggleInfJump", {
 		Title = "Inf Jump",
-		--Description = "Allows continuous jumping mid-air",
 		Default = getgenv().ToggleInfJump
 	})
 	ToggleInfJump:OnChanged(function()
@@ -876,7 +843,6 @@ run(function()
 
 	local ToggleNoclip = PlayerSettingTab:CreateToggle("ToggleNoclip", {
 		Title = "Noclip",
-		--Description = "When you move, you can pass through a wall in front of you",
 		Default = getgenv().ToggleNoclip
 	})
 	ToggleNoclip:OnChanged(function()
@@ -888,9 +854,9 @@ run(function()
 		Title = "Executor: " .. identifyexecutor() or "Unknown" .. "",
 	})
 
-	Tabs.Client:CreateParagraph("hwidinfo",{
-		Title = "HWID: " .. tostring(game:GetService("RbxAnalyticsService"):GetClientId()) or "Unknown" .. "",
-	})  
+	Tabs.Client:CreateParagraph("gameid",{
+		Title = "Game ID: " .. tostring(PlaceID) or "Unknown" .. "",
+	})
 
 	Tabs.Client:CreateParagraph("appver",{
 		Title = "Application Version: " .. Version() or "Unknown" .. "",
@@ -902,13 +868,11 @@ run(function()
 
 	ToggleCtrlTP = TeleportSection:CreateToggle("CtrlTP", {
 		Title = "CtrlTP",
-		--Description = "",
 		Default = getgenv().CtrlTP
 	})
 
 	PlayerDropdown = TeleportSection:CreateDropdown("PlayerDropdown", {
 		Title = "Player Select",
-		--Description = "You have the ability to teleport to any player of your choice",
 		Values = getAllPlayerNames(),
 		Multi = false,
 		Default = getgenv().PlayerDropdown or 1
@@ -926,7 +890,6 @@ run(function()
 		PlayerDropdown:Destroy()
 		PlayerDropdown = TeleportSection:CreateDropdown("PlayerDropdown", {
 			Title = "Player Select",
-			--Description = "You have the ability to teleport to any player of your choice",
 			Values = getAllPlayerNames(),
 			Multi = false,
 			Default = getgenv().PlayerDropdown or 1
@@ -934,7 +897,6 @@ run(function()
 		RefreshPlayerButton:Destroy()
 		RefreshPlayerButton = TeleportSection:CreateButton({
 			Title = "Refresh Player",
-			--Description = "This button resets the player list",
 			Callback = function()
 				getgenv().RefreshTeleportTabs()
 			end
@@ -943,7 +905,6 @@ run(function()
 		TeleportPlayerButton:Destroy()
 		TeleportPlayerButton = TeleportSection:CreateButton({
 			Title = "Teleport to Players",
-			--Description = "Instantly Teleport to Players",
 			Callback = function()
 				local localPlayer = Players.LocalPlayer
 				local targetPlayer = Players:FindFirstChild(getgenv().PlayerDropdown)
@@ -967,7 +928,6 @@ run(function()
 
 	RefreshPlayerButton = TeleportSection:CreateButton({
 		Title = "Refresh Player",
-		--Description = "This button resets the player list",
 		Callback = function()
 			getgenv().RefreshTeleportTabs()
 		end
@@ -975,7 +935,6 @@ run(function()
 
 	TeleportPlayerButton = TeleportSection:CreateButton({
 		Title = "Teleport to Players",
-		--Description = "Instantly Teleport to Players",
 		Callback = function()
 			local localPlayer = Players.LocalPlayer
 			local targetPlayer = Players:FindFirstChild(getgenv().PlayerDropdown)
@@ -996,7 +955,6 @@ run(function()
 
 	ServerSection:CreateButton({
 		Title = "Server Hop",
-		--Description = "",
 		Callback = function()
 			Fluent:Notify({
 				Title = getgenv().UnjiWareNameSaved,
@@ -1009,7 +967,6 @@ run(function()
 
 	ServerSection:CreateButton({
 		Title = "Rejoin Server",
-		--Description = "",
 		Callback = function()
 			Fluent:Notify({
 				Title = getgenv().UnjiWareNameSaved,
@@ -1023,12 +980,10 @@ run(function()
 	local AnySettingSection = Tabs.Settings:CreateSection("System Setting")
 	local checkjarkup = AnySettingSection:CreateToggle("checkjarkup", {
 		Title = "Keep Working",
-		--Description = "The current system can be kept running just the way it is",
 		Default = getgenv().checkjarkup or false
 	})
 	local AutoSaveToggle = AnySettingSection:CreateToggle("AutoSave", {
 		Title = "Auto Save Settings",
-		--Description = "Beta system",
 		Default = Settings.Current.AutoSave
 	})
 	AutoSaveToggle:OnChanged(function(value)
@@ -1037,7 +992,6 @@ run(function()
 	end)
 	local AutoReExecuteToggle = AnySettingSection:CreateToggle("AutoReExecute", {
 		Title = "Auto ReExecute",
-		--Description = "",
 		Default = Settings.Current.Toggles.AutoReExecute
 	})
 	AutoReExecuteToggle:OnChanged(function()
@@ -1061,7 +1015,6 @@ run(function()
 	end)
 	local ThemeSettings = AnySettingSection:CreateDropdown("InterfaceTheme", {
 		Title = "Theme",
-		--Description = "Changes the interface theme.",
 		Values = Fluent.Themes,
 		Default = Fluent.Theme,
 		Multi = false,
