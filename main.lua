@@ -169,6 +169,7 @@ getgenv().ToggleUI = "RightControl"
 local gui = Instance.new("ScreenGui");
 gui.Name = "tracerUI";
 gui.ResetOnSpawn = true;
+gui.IgnoreGuiInset = true;
 gui.Parent = game:GetService("CoreGui");
 gui.DisplayOrder = math.huge
 local PlaceID = game.PlaceId
@@ -1537,7 +1538,7 @@ if not getgenv().NyaNya then
 							local angle = math.atan2(screenPoint.Y - camera.ViewportSize.Y/2, screenPoint.X - camera.ViewportSize.X/2)
 							local radius = tonumber(Options.TracerRadius.Value) + 10
 							local cx = camera.ViewportSize.X/2 + math.cos(angle)*radius
-							local cy = camera.ViewportSize.Y/2 + (-57) + math.sin(angle)*radius -- -57 은 매우 중요함
+							local cy = camera.ViewportSize.Y/2 + math.sin(angle)*radius
 
 							local size = 14
 							local rotation = (math.deg(angle) + 90) % 360
