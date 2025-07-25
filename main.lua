@@ -72,7 +72,6 @@ getgenv()._aimState = {
 	nextSwitch = tick()
 }
 
-local Shader = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/junkm012/roblox/main/Shader.lua"))()
 local Fluent = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
 local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
 local InterfaceManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/InterfaceManager.luau"))()
@@ -472,8 +471,6 @@ run(function()
 	if Players:GetUserIdFromNameAsync(player.Name) == 2759165852 then
 		rankmeowmeow = "Owner"
 	end
-
-	sendChatMessage("UnjiWare.lua is Loaded!")
 
 	Tabs.Home:CreateParagraph("welcome",{
 		Title = "Welcome To " .. getgenv().UnjiWareNameSaved .. " " .. getgenv().UnjiWareVerSaved .. "!, " ..player.Name,
@@ -1044,9 +1041,9 @@ run(function()
 	})
 	AutoReExecuteToggle:OnChanged(function()
 		if Options.AutoReExecute.Value then 
-			queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/junkm012/roblox/main/Rivals.lua", true))()]]) 
+			queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Ukrubojvo/UnjiWare/main/main.lua", true))()]]) 
 		else 
-			queue_on_teleport([[]])
+			queue_on_teleport([[print("unload")]])
 		end
 	end)
 	local menuKeyBind = AnySettingSection:CreateKeybind("MenuKeybind", { Title = "Minimize Bind", Default = "RightControl" })
